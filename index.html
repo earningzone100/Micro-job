@@ -270,8 +270,8 @@
         #add-task-thumbnail-preview { max-width: 150px; border-radius: 8px; margin-top: 1rem; display: none; }
         
         input, select, textarea { width: 100%; padding: 1rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 0.95rem; }
-        input:disabled, select:disabled, textarea:disabled, button:disabled, .button:disabled { background-color: #f0f2f5; cursor: not-allowed; opacity: 0.7; color: var(--grey-color); border-color: #ddd;}
-        button:disabled, .button:disabled { background: var(--grey-color); }
+        input:disabled, select:disabled, textarea:disabled { background-color: #f0f2f5; cursor: not-allowed; opacity: 0.7; }
+        button:disabled, .button:disabled { background: var(--grey-color); color: white; cursor: not-allowed; opacity: 0.7; }
 
         .payment-method-grid {
             display: grid;
@@ -346,7 +346,6 @@
             border: none;
             margin-left: 1rem;
         }
-        /* MY JOBS ACTION BUTTONS */
         .my-job-actions {
             display: flex;
             gap: 0.5rem;
@@ -480,7 +479,7 @@
         window.copyToClipboard = (text) => {
             if (navigator.clipboard) {
                  navigator.clipboard.writeText(text).then(() => alert('Copied!'));
-            } else { // Fallback for older browsers
+            } else {
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
                 document.body.appendChild(textarea);
@@ -508,37 +507,23 @@
         
         function initializeLandingPage() {
             showLoader(false);
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const mobileNav = document.getElementById('mobile-nav');
-            const innerCloseBtn = document.getElementById('mobile-menu-close-btn-inner');
-
-            const toggleMobileMenu = () => {
-                mobileNav.classList.toggle('is-open');
-                document.body.classList.toggle('no-scroll');
-            };
-
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn'), mobileNav = document.getElementById('mobile-nav'), innerCloseBtn = document.getElementById('mobile-menu-close-btn-inner');
+            const toggleMobileMenu = () => { mobileNav.classList.toggle('is-open'); document.body.classList.toggle('no-scroll'); };
             mobileMenuBtn.addEventListener('click', toggleMobileMenu);
             innerCloseBtn.addEventListener('click', toggleMobileMenu);
-
             const showAuthView = (showRegister = false) => {
-                landingPageView.style.display = 'none';
-                authView.style.display = 'block';
+                landingPageView.style.display = 'none'; authView.style.display = 'block';
                 document.getElementById('login-box').style.display = showRegister ? 'none' : 'block';
                 document.getElementById('register-box').style.display = showRegister ? 'block' : 'none';
                 document.getElementById('forgot-password-box').style.display = 'none';
-                if (mobileNav.classList.contains('is-open')) {
-                    toggleMobileMenu();
-                }
+                if (mobileNav.classList.contains('is-open')) toggleMobileMenu();
                 initializeAuthView();
             };
-
             document.getElementById('show-login-header').onclick = (e) => { e.preventDefault(); showAuthView(false); };
             document.getElementById('show-register-header').onclick = (e) => { e.preventDefault(); showAuthView(true); };
             document.getElementById('show-login-mobile').onclick = (e) => { e.preventDefault(); showAuthView(false); };
             document.getElementById('show-register-mobile').onclick = (e) => { e.preventDefault(); showAuthView(true); };
-            
             document.getElementById('start-earning-btn').onclick = (e) => { e.preventDefault(); showAuthView(true); };
-
             initializeRealtimeStats();
         }
 
@@ -548,8 +533,7 @@
                 if (snapshot.exists()) {
                     const stats = snapshot.val();
                     const animateValue = (element, start, end, duration) => {
-                        if (!element) return;
-                        let startTimestamp = null;
+                        if (!element) return; let startTimestamp = null;
                         const step = (timestamp) => {
                             if (!startTimestamp) startTimestamp = timestamp;
                             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
@@ -569,78 +553,25 @@
         
         function initializeAuthView() {
             showLoader(false);
-            const loginForm = document.getElementById('login-form'),
-                registerForm = document.getElementById('register-form'),
-                forgotPasswordForm = document.getElementById('forgot-password-form'),
-                showRegister = document.getElementById('show-register'),
-                showLogin = document.getElementById('show-login'),
-                showForgotPassword = document.getElementById('show-forgot-password'),
-                backToLogin = document.getElementById('back-to-login'),
-                loginBox = document.getElementById('login-box'),
-                registerBox = document.getElementById('register-box'),
-                forgotPasswordBox = document.getElementById('forgot-password-box'),
-                authErrorMessage = document.getElementById('auth-error-message');
-
+            const loginForm = document.getElementById('login-form'), registerForm = document.getElementById('register-form'), forgotPasswordForm = document.getElementById('forgot-password-form'), showRegister = document.getElementById('show-register'), showLogin = document.getElementById('show-login'), showForgotPassword = document.getElementById('show-forgot-password'), backToLogin = document.getElementById('back-to-login'), loginBox = document.getElementById('login-box'), registerBox = document.getElementById('register-box'), forgotPasswordBox = document.getElementById('forgot-password-box'), authErrorMessage = document.getElementById('auth-error-message');
             const urlParams = new URLSearchParams(window.location.search);
             const refCode = urlParams.get('ref');
             if (refCode) {
                 const referInput = document.getElementById('register-refer-code');
-                referInput.value = refCode.trim().toUpperCase();
-                referInput.disabled = true;
-                loginBox.style.display = 'none';
-                registerBox.style.display = 'block';
+                referInput.value = refCode.trim().toUpperCase(); referInput.disabled = true; loginBox.style.display = 'none'; registerBox.style.display = 'block';
             }
-
             const eyeIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>`;
             const eyeSlashIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"></path></svg>`;
-            
             document.querySelectorAll('.password-toggle').forEach(toggle => {
                 toggle.innerHTML = eyeIconSVG;
-                toggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const inputId = toggle.dataset.for;
-                    const passwordInput = document.getElementById(inputId);
-                    if (passwordInput.type === "password") {
-                        passwordInput.type = "text";
-                        toggle.innerHTML = eyeSlashIconSVG;
-                    } else {
-                        passwordInput.type = "password";
-                        toggle.innerHTML = eyeIconSVG;
-                    }
-                });
+                toggle.addEventListener('click', (e) => { e.preventDefault(); const inputId = toggle.dataset.for; const passwordInput = document.getElementById(inputId); if (passwordInput.type === "password") { passwordInput.type = "text"; toggle.innerHTML = eyeSlashIconSVG; } else { passwordInput.type = "password"; toggle.innerHTML = eyeIconSVG; } });
             });
-
             const switchToLogin = (e) => { if(e) e.preventDefault(); registerBox.style.display = 'none'; forgotPasswordBox.style.display = 'none'; loginBox.style.display = 'block'; authErrorMessage.style.display = 'none'; };
             const switchToRegister = (e) => { if(e) e.preventDefault(); loginBox.style.display = 'none'; forgotPasswordBox.style.display = 'none'; registerBox.style.display = 'block'; authErrorMessage.style.display = 'none'; };
             const switchToForgot = (e) => { if(e) e.preventDefault(); loginBox.style.display = 'none'; registerBox.style.display = 'none'; forgotPasswordBox.style.display = 'block'; authErrorMessage.style.display = 'none'; };
-            
-            showRegister.onclick = switchToRegister;
-            showLogin.onclick = switchToLogin;
-            showForgotPassword.onclick = switchToForgot;
-            backToLogin.onclick = switchToLogin;
-
-            loginForm.onsubmit = e => {
-                e.preventDefault(); showLoader(true); authErrorMessage.style.display = 'none';
-                signInWithEmailAndPassword(auth, loginForm['login-email'].value, loginForm['login-password'].value)
-                    .catch(err => {
-                         if (err.code === 'auth/invalid-credential' || err.code === 'auth/invalid-login-credentials' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') { authErrorMessage.textContent = "আপনার দেওয়া ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।";
-                        } else { authErrorMessage.textContent = "একটি অপ্রত্যাশিত সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"; }
-                        authErrorMessage.style.display = 'block';
-                    }).finally(() => showLoader(false));
-            };
-            
-            forgotPasswordForm.onsubmit = e => {
-                e.preventDefault(); showLoader(true); authErrorMessage.style.display = 'none';
-                const email = forgotPasswordForm['forgot-email'].value;
-                sendPasswordResetEmail(auth, email)
-                    .then(() => { alert("পাসওয়ার্ড রিসেট করার লিংক আপনার ইমেইলে পাঠানো হয়েছে। অনুগ্রহ করে আপনার ইনবক্স চেক করুন।"); switchToLogin(); })
-                    .catch((error) => {
-                        if(error.code === 'auth/user-not-found'){ authErrorMessage.textContent = "এই ইমেইল দিয়ে কোনো একাউন্ট খুঁজে পাওয়া যায়নি।";
-                        } else { authErrorMessage.textContent = "একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"; }
-                        authErrorMessage.style.display = 'block';
-                    }).finally(() => { showLoader(false); });
-            };
-
+            showRegister.onclick = switchToRegister; showLogin.onclick = switchToLogin; showForgotPassword.onclick = switchToForgot; backToLogin.onclick = switchToLogin;
+            loginForm.onsubmit = e => { e.preventDefault(); showLoader(true); authErrorMessage.style.display = 'none'; signInWithEmailAndPassword(auth, loginForm['login-email'].value, loginForm['login-password'].value).catch(err => { if (['auth/invalid-credential','auth/invalid-login-credentials','auth/wrong-password','auth/user-not-found'].includes(err.code)) { authErrorMessage.textContent = "আপনার দেওয়া ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।"; } else { authErrorMessage.textContent = "একটি অপ্রত্যাশিত সমস্যা হয়েছে।"; } authErrorMessage.style.display = 'block'; }).finally(() => showLoader(false)); };
+            forgotPasswordForm.onsubmit = e => { e.preventDefault(); showLoader(true); authErrorMessage.style.display = 'none'; sendPasswordResetEmail(auth, forgotPasswordForm['forgot-email'].value).then(() => { alert("পাসওয়ার্ড রিসেট করার লিংক আপনার ইমেইলে পাঠানো হয়েছে।"); switchToLogin(); }).catch((error) => { if(error.code === 'auth/user-not-found'){ authErrorMessage.textContent = "এই ইমেইল দিয়ে কোনো একাউন্ট খুঁজে পাওয়া যায়নি।"; } else { authErrorMessage.textContent = "একটি সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।"; } authErrorMessage.style.display = 'block'; }).finally(() => { showLoader(false); }); };
             registerForm.onsubmit = async e => {
                 e.preventDefault(); showLoader(true); authErrorMessage.style.display = 'none'; let referredBy = null;
                 const referCode = registerForm['register-refer-code'].value.trim().toUpperCase();
@@ -740,22 +671,13 @@
             const handleRouting = (userData) => {
                 const [hash, params] = (window.location.hash.substring(1) || 'home').split('?');
                 const urlParams = new URLSearchParams(params);
-
                 navItems.forEach(item => item.classList.toggle('active', item.dataset.page === hash));
-
                 if (userData.isActive === false) {
-                    if (['home', 'wallet', ''].includes(hash)) {
-                        renderActivationPage(userData);
-                    } else {
-                        appContent.innerHTML = `<div class="card alert-card alert-inactive"><h3>Account Not Active</h3><p>Please activate your account to access this feature.</p></div>`;
-                    }
+                    if (['home', 'wallet', ''].includes(hash)) { renderActivationPage(userData);
+                    } else { appContent.innerHTML = `<div class="card alert-card alert-inactive"><h3>Account Not Active</h3><p>Please activate your account to access this feature.</p></div>`; }
                 } else {
-                    if (hash === 'task-details' && urlParams.has('id')) {
-                        renderTaskDetailsPage(urlParams.get('id'), userData);
-                    } else {
-                        const route = routes[hash] || routes.home;
-                        route(userData);
-                    }
+                    if (hash === 'task-details' && urlParams.has('id')) { renderTaskDetailsPage(urlParams.get('id'), userData);
+                    } else { (routes[hash] || routes.home)(userData); }
                 }
             };
             
@@ -763,29 +685,23 @@
                 if (!snapshot.exists()) { signOut(auth); return; }
                 activeUserData = { uid: currentUserId, ...snapshot.val() };
                 document.getElementById('user-name').textContent = activeUserData.name;
-                const profileIcon = document.getElementById('profile-icon');
-                profileIcon.src = activeUserData.profilePicture ? activeUserData.profilePicture : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(activeUserData.name)}`;
+                document.getElementById('profile-icon').src = activeUserData.profilePicture || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(activeUserData.name)}`;
                 document.getElementById('user-balance-val').textContent = (activeUserData.balance || 0).toFixed(2);
                 handleRouting(activeUserData);
             }, (error) => { console.error("Firebase Error:", error); signOut(auth); });
             
             const getTaskCategoryDisplayName = (task) => {
-                if (task.subCategory && appSettings.categorySettings && appSettings.categorySettings[task.category] && appSettings.categorySettings[task.category].subCategories && appSettings.categorySettings[task.category].subCategories[task.subCategory]) {
+                if (task.subCategory && appSettings.categorySettings?.[task.category]?.subCategories?.[task.subCategory]) {
                     return appSettings.categorySettings[task.category].subCategories[task.subCategory].name;
-                }
-                return task.category;
+                } return task.category;
             };
 
             const getPricingSettings = (taskData) => {
                 const { category, subCategory } = taskData;
                 const mainCategory = appSettings.categorySettings?.[category];
                 if (!mainCategory) return null;
-                if (subCategory && mainCategory.subCategories?.[subCategory]) {
-                    return mainCategory.subCategories[subCategory];
-                }
-                if (mainCategory.workerReward !== undefined) {
-                    return mainCategory; 
-                }
+                if (subCategory && mainCategory.subCategories?.[subCategory]) { return mainCategory.subCategories[subCategory]; }
+                if (mainCategory.workerReward !== undefined) { return mainCategory; }
                 return null;
             }
 
@@ -1148,34 +1064,37 @@
                  else if (action === 'request-delete-job') {
                      if (!confirm('Are you sure you want to request deletion for this job?')) return;
                      showLoader(true);
-                     const taskRef = ref(database, `tasks/${taskId}`);
-                     const taskSnap = await get(taskRef);
-                     if (!taskSnap.exists()) { alert("Job not found."); showLoader(false); return; }
-                     
-                     const taskData = taskSnap.val();
-                     const { quantity, completedCount = 0, reward, screenshotsRequired } = taskData;
-                     const remainingQty = quantity - completedCount;
+                     try {
+                        const taskRef = ref(database, `tasks/${taskId}`);
+                        const taskSnap = await get(taskRef);
+                        if (!taskSnap.exists()) throw new Error("Job not found.");
+                        
+                        const taskData = taskSnap.val();
+                        const { quantity, completedCount = 0, reward, screenshotsRequired } = taskData;
+                        const remainingQty = quantity - completedCount;
 
-                     const pricingSettings = getPricingSettings(taskData);
-                     if(!pricingSettings) { 
-                         alert("Cannot calculate refund, category/pricing settings missing."); 
-                         showLoader(false); 
-                         return;
-                     }
-                     
-                     const platformFee = pricingSettings.platformFee || 0;
-                     const extraScreenshotCost = appSettings.extraScreenshotCost || 0;
-                     const costPerTask = reward + platformFee + ((screenshotsRequired > 1 ? screenshotsRequired -1 : 0) * extraScreenshotCost);
-                     
-                     await push(ref(database, 'deleteRequests'), {
-                         taskId, creatorId: currentUserId, userName: activeUserData.name,
-                         status: 'pending', timestamp: serverTimestamp(),
-                         jobTitle: taskData.title, remainingQty, costPerTask,
-                     });
-                     await update(taskRef, { status: 'pending_deletion' });
-                     alert("Deletion request sent successfully!");
-                     renderMyJobsPage(activeUserData);
-                     showLoader(false);
+                        const pricingSettings = getPricingSettings(taskData);
+                        if(!pricingSettings) {
+                           throw new Error("Cannot calculate refund, category/pricing settings for this job are missing or have been updated. Please contact support if you believe this is an error.");
+                        }
+                        
+                        const platformFee = pricingSettings.platformFee || 0;
+                        const extraScreenshotCost = appSettings.extraScreenshotCost || 0;
+                        const costPerTask = reward + platformFee + ((screenshotsRequired > 1 ? screenshotsRequired -1 : 0) * extraScreenshotCost);
+                        
+                        await push(ref(database, 'deleteRequests'), {
+                            taskId, creatorId: currentUserId, userName: activeUserData.name,
+                            status: 'pending', timestamp: serverTimestamp(),
+                            jobTitle: taskData.title, remainingQty, costPerTask,
+                        });
+                        await update(taskRef, { status: 'pending_deletion' });
+                        alert("Deletion request sent successfully!");
+                        renderMyJobsPage(activeUserData);
+                    } catch(err) {
+                        alert(err.message);
+                    } finally {
+                        showLoader(false);
+                    }
                  }
             });
 
