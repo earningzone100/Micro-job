@@ -1116,7 +1116,8 @@
                         await runTransaction(ref(database, `tasks/${taskId}/completedCount`), (count) => (count || 0) + 1);
                         const [userSnap, settingsSnap] = await Promise.all([ get(ref(database, `users/${submitterId}`)), get(ref(database, 'settings')) ]);
                         if (userSnap.exists() && settingsSnap.exists()) {
-                            const user = userSnap.val(), { referralBonus = 0, referralRequiredJobs = 0 } = settingsSnap.val();
+                            const user = userSnap.val(), settings = settingsSnap.val();
+                            const referralBonus = settings.referralBonus || 0, requiredJobs = settings.referralRequiredJobs || 0;
                             if (user.referredBy && !user.referralBonusAwarded && referralBonus > 0 && requiredJobs > 0 && user.tasksCompleted >= requiredJobs) {
                                 await runTransaction(ref(database, `users/${user.referredBy}`), (r) => { if (r) { r.balance = (r.balance || 0) + referralBonus; r.referralIncome = (r.referralIncome || 0) + referralBonus; } return r; });
                                 await update(ref(database, `users/${submitterId}`), { referralBonusAwarded: true }); alertMessage += `\nReferral bonus of ৳${referralBonus} paid!`;
@@ -1287,11 +1288,10 @@
                     let html = '';
                     if (snapshot.exists()) {
                         let requests = [];
-                        snapshot.forEach(child => {
-                            requests.push(child.val());
-                        });
-                        requests.reverse().forEach(item => {
-                            html += `<div class="list-item"><div><strong>৳${item.amount} via ${item.method || ''}</strong><br><small>${new Date(item.timestamp).toLocaleDateString('en-GB')}</small></div><span class="status-badge status-${item.status}">${item.status}</span></div>`;
+                        snapshot.forEach(child => { requests.push(child.val()); });
+                        requests.reverse();
+                        requests.forEach(item => {
+                            html += `<div class="list-item"><div><strong>৳${item.amount} via ${item.method || ''}</strong><br><small>${new Date(item.timestamp).toLocaleDateString('en-GB')}</small></div><span class="status-badge status-${item.status}">${item.status}</span></div>`; 
                         });
                         historyEl.innerHTML = html;
                     } else {
